@@ -2,7 +2,7 @@
 
 [![CI](https://github.com/newtqnia/newtqnia-go/actions/workflows/ci.yml/badge.svg)](https://github.com/newtqnia/newtqnia-go/actions/workflows/ci.yml)
 [![Go Reference](https://pkg.go.dev/badge/github.com/newtqnia/newtqnia-go.svg)](https://pkg.go.dev/github.com/newtqnia/newtqnia-go)
-[![Go Report Card](https://goreportcard.com/badge/github.com/newtqnia/newtqnia-go)](https://goreportcard.com/report/github.com/newtqnia/newtqnia-go)
+[![Go](https://img.shields.io/badge/Go-1.22%2B-00ADD8?logo=go&logoColor=white)](go.mod)
 [![License](https://img.shields.io/badge/license-MIT-blue)](LICENSE)
 
 The official, dependency-free Go SDK for the [NewTqnia technology news API](https://newtqnia.com/en/developers). It provides typed English and Arabic news, `context.Context` cancellation, request timeouts, automatic retries, `Retry-After` support, typed errors, and configurable HTTP transports.
