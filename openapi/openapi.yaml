@@ -1,0 +1,75 @@
+openapi: 3.1.0
+info:
+  title: NewTqnia Daily Digest API
+  version: 1.1.0
+  description: Public, read-only access to localized NewTqnia technology-news summaries.
+  termsOfService: https://newtqnia.com/en/terms
+  contact: {name: NewTqnia, url: https://newtqnia.com/en/contact}
+servers:
+  - {url: https://api.newtqnia.com, description: Canonical API endpoint}
+  - {url: https://newtqnia.com, description: Legacy compatibility endpoint}
+paths:
+  /v1/news/today:
+    get:
+      operationId: getTodaysNews
+      summary: Get articles published today using the Asia/Dubai day boundary
+      parameters: [{$ref: '#/components/parameters/Locale'}, {$ref: '#/components/parameters/Limit'}, {$ref: '#/components/parameters/Category'}]
+      responses:
+        '200':
+          description: Today's localized digest
+          headers:
+            ETag: {$ref: '#/components/headers/ETag'}
+            Cache-Control: {$ref: '#/components/headers/CacheControl'}
+          content: {application/json: {schema: {$ref: '#/components/schemas/Digest'}}}
+        '304': {description: Not modified}
+        '429': {description: Rate limit exceeded}
+  /v1/news/latest:
+    get:
+      operationId: getLatestNews
+      summary: Get the latest published articles
+      parameters: [{$ref: '#/components/parameters/Locale'}, {$ref: '#/components/parameters/Limit'}, {$ref: '#/components/parameters/Category'}]
+      responses:
+        '200': {description: Latest localized articles, content: {application/json: {schema: {$ref: '#/components/schemas/Digest'}}}}
+        '304': {description: Not modified}
+        '429': {description: Rate limit exceeded}
+components:
+  parameters:
+    Locale: {name: locale, in: query, schema: {type: string, enum: [en, ar], default: en}}
+    Limit: {name: limit, in: query, schema: {type: integer, minimum: 1, maximum: 10, default: 10}}
+    Category: {name: category, in: query, schema: {type: string}, description: Optional category slug.}
+  headers:
+    ETag:
+      schema: {type: string}
+      description: Validator for conditional requests using If-None-Match.
+    CacheControl:
+      schema: {type: string}
+      description: Public caching instructions.
+  schemas:
+    Digest:
+      type: object
+      required: [api_version, collection, timezone, locale, direction, publisher, attribution, generated_at, articles, _links]
+      properties:
+        api_version: {type: string, const: v1}
+        collection: {type: string, enum: [today, latest]}
+        date: {type: string, format: date}
+        timezone: {type: string, const: Asia/Dubai}
+        locale: {type: string, enum: [en, ar]}
+        direction: {type: string, enum: [ltr, rtl]}
+        publisher: {$ref: '#/components/schemas/LinkLabel'}
+        attribution: {type: object, required: [text, url, required], properties: {text: {type: string}, url: {type: string, format: uri}, required: {type: boolean}}}
+        generated_at: {type: string, format: date-time}
+        articles: {type: array, items: {$ref: '#/components/schemas/Article'}}
+        _links: {type: object, additionalProperties: {type: string, format: uri}}
+    Article:
+      type: object
+      required: [id, title, summary, category, image, url, published_at, read_time]
+      properties:
+        id: {type: integer}
+        title: {type: string}
+        summary: {type: string}
+        category: {type: object, required: [slug, name], properties: {slug: {type: string}, name: {type: string}}}
+        image: {type: string, format: uri}
+        url: {type: string, format: uri}
+        published_at: {type: string, format: date-time}
+        read_time: {type: integer, minimum: 1}
+    LinkLabel: {type: object, required: [name, url], properties: {name: {type: string}, url: {type: string, format: uri}}}
